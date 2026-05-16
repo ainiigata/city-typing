@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>市役所タイピング</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="topbar" aria-label="アプリ概要">
+        <div class="brand-lockup">
+          <div class="city-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="img">
+              <path d="M14 54h36V24L32 12 14 24v30Z" />
+              <path d="M23 54V35h18v19M24 25h4m8 0h4M24 33h4m8 0h4" />
+              <path d="M10 54h44" />
+            </svg>
+          </div>
+          <div>
+            <p class="eyebrow">Public Office Typing</p>
+            <h1>市役所職員 用語タイピング</h1>
+          </div>
+        </div>
+        <div class="session-stats" aria-label="成績">
+          <div><span id="score">0</span><small>score</small></div>
+          <div><span id="accuracy">100%</span><small>accuracy</small></div>
+          <div><span id="streak">0</span><small>streak</small></div>
+          <div><span id="speed">0</span><small>kpm</small></div>
+        </div>
+      </section>
+
+      <section class="home-screen" id="homeScreen" data-view="home" aria-label="スタートメニュー">
+        <div class="menu-heading">
+          <p class="eyebrow">Start</p>
+          <h2>今日はどっちで進めますか</h2>
+        </div>
+        <div class="mode-cards">
+          <button class="mode-card" id="choosePractice" type="button">
+            <span>練習</span>
+            <strong>用語を覚えながら打つ</strong>
+            <small>時間を気にせず、意味と読み方を確認できます。</small>
+          </button>
+          <button class="mode-card test" id="chooseTest" type="button">
+            <span>テスト</span>
+            <strong>制限時間でスコアに挑戦</strong>
+            <small>難易度別の時間で採点し、記録に残します。</small>
+          </button>
+        </div>
+      </section>
+
+      <section class="setup-screen" id="setupScreen" data-view="setup" aria-label="開始設定">
+        <div class="setup-header">
+          <button class="text-button" id="setupBack" type="button">メニューへ</button>
+          <div>
+            <p class="eyebrow" id="setupModeLabel">Practice</p>
+            <h2 id="setupTitle">練習を始める</h2>
+          </div>
+        </div>
+        <div class="setup-steps">
+          <section class="setup-step">
+            <div class="step-title"><span>1</span><h3>分野を選ぶ</h3></div>
+            <div class="choice-grid" id="categoryChoices"></div>
+          </section>
+          <section class="setup-step">
+            <div class="step-title"><span>2</span><h3>難易度を選ぶ</h3></div>
+            <div class="choice-grid level-grid" id="levelChoices"></div>
+          </section>
+          <section class="setup-step">
+            <div class="step-title"><span>3</span><h3>時間を選ぶ</h3></div>
+            <div class="choice-grid time-grid" id="timeChoices"></div>
+          </section>
+        </div>
+        <div class="start-strip">
+          <div>
+            <strong id="startSummary">練習 / すべて / すべて / 無制限</strong>
+            <span id="startHint">ボタンを選んだら開始できます。</span>
+          </div>
+          <button class="primary-button" id="startRun" type="button">スタート</button>
+        </div>
+      </section>
+
+      <section class="controls utility-hidden" aria-label="練習設定">
+        <div class="control-group">
+          <label for="category">分野</label>
+          <select id="category"></select>
+        </div>
+        <div class="control-group">
+          <label for="level">難易度</label>
+          <select id="level">
+            <option value="all">すべて</option>
+            <option value="1">基礎</option>
+            <option value="2">標準</option>
+            <option value="3">発展</option>
+          </select>
+        </div>
+        <div class="control-group compact">
+          <label for="mode">形式</label>
+          <select id="mode">
+            <option value="practice">練習</option>
+            <option value="test">テスト</option>
+          </select>
+        </div>
+        <div class="control-group compact">
+          <label for="timer">時間</label>
+          <select id="timer">
+            <option value="0">標準/無制限</option>
+            <option value="30">30秒</option>
+            <option value="60">1分</option>
+            <option value="120">2分</option>
+            <option value="180">3分</option>
+            <option value="300">5分</option>
+          </select>
+        </div>
+        <button class="icon-button" id="restart" type="button" aria-label="再開">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" />
+          </svg>
+        </button>
+      </section>
+
+      <section class="play-actions" id="playActions" data-view="play" aria-label="プレイ操作">
+        <button class="text-button" id="playBack" type="button">設定へ</button>
+        <button class="text-button" id="quickRestart" type="button">もう一度</button>
+      </section>
+
+      <section class="practice-zone" id="practiceZone" data-view="play" aria-label="タイピング">
+        <div class="term-panel">
+          <div class="term-meta">
+            <span id="termCategory">住民窓口</span>
+            <span id="termLevel">基礎</span>
+          </div>
+          <p class="reading" id="reading">じゅうみんひょう</p>
+          <div class="target" id="target">住民票</div>
+          <div class="typing-ghost" id="typingGhost"></div>
+          <div class="progress-track" aria-hidden="true">
+            <div id="progressBar"></div>
+          </div>
+          <input id="typingInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="入力欄" />
+        </div>
+        <aside class="meaning-panel" aria-label="用語情報">
+          <div class="timer-card">
+            <span id="timeLeft">--:--</span>
+            <small>time</small>
+          </div>
+          <h2 id="termTitle">住民票</h2>
+          <p id="meaning">住民の氏名、住所、生年月日などを記録した公的な証明書。</p>
+          <p class="game-message" id="gameMessage">Enterで入力を確定できます。</p>
+          <div class="tag-row" id="tagRow"></div>
+        </aside>
+      </section>
+
+      <section class="result-panel" id="resultPanel" data-view="play" aria-label="結果">
+        <div>
+          <h2>テスト結果</h2>
+          <p id="resultSummary">まだ結果はありません。</p>
+        </div>
+        <button id="retryTest" type="button">もう一度</button>
+      </section>
+
+      <section class="lower-grid" id="lowerGrid" data-view="play" aria-label="学習状況">
+        <div class="list-panel">
+          <div class="panel-heading">
+            <h2>出題中</h2>
+            <span id="remainingCount">0 terms</span>
+          </div>
+          <ol id="queueList"></ol>
+        </div>
+        <div class="list-panel">
+          <div class="panel-heading">
+            <h2>復習</h2>
+            <button id="clearReview" type="button">clear</button>
+          </div>
+          <ul id="reviewList"></ul>
+        </div>
+        <div class="list-panel">
+          <div class="panel-heading">
+            <h2>スコア記録</h2>
+            <button id="clearRecords" type="button">clear</button>
+          </div>
+          <ol id="recordList"></ol>
+        </div>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
