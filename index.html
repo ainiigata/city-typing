@@ -18,15 +18,27 @@
             </svg>
           </div>
           <div>
-            <p class="eyebrow">Public Office Typing</p>
+            <p class="eyebrow">Public Office Arcade ✦</p>
             <h1>市役所職員 用語タイピング</h1>
           </div>
         </div>
         <div class="session-stats" aria-label="成績">
-          <div><span id="score">0</span><small>score</small></div>
-          <div><span id="accuracy">100%</span><small>accuracy</small></div>
-          <div><span id="streak">0</span><small>streak</small></div>
-          <div><span id="speed">0</span><small>kpm</small></div>
+          <div>
+            <span id="score">0</span>
+            <small>score</small>
+          </div>
+          <div>
+            <span id="accuracy">100%</span>
+            <small>accuracy</small>
+          </div>
+          <div>
+            <span id="streak">0</span>
+            <small>streak</small>
+          </div>
+          <div>
+            <span id="speed">0</span>
+            <small>kpm</small>
+          </div>
         </div>
       </section>
 
@@ -59,15 +71,24 @@
         </div>
         <div class="setup-steps">
           <section class="setup-step">
-            <div class="step-title"><span>1</span><h3>分野を選ぶ</h3></div>
+            <div class="step-title">
+              <span>1</span>
+              <h3>分野を選ぶ</h3>
+            </div>
             <div class="choice-grid" id="categoryChoices"></div>
           </section>
           <section class="setup-step">
-            <div class="step-title"><span>2</span><h3>難易度を選ぶ</h3></div>
+            <div class="step-title">
+              <span>2</span>
+              <h3>難易度を選ぶ</h3>
+            </div>
             <div class="choice-grid level-grid" id="levelChoices"></div>
           </section>
           <section class="setup-step">
-            <div class="step-title"><span>3</span><h3>時間を選ぶ</h3></div>
+            <div class="step-title">
+              <span>3</span>
+              <h3>時間を選ぶ</h3>
+            </div>
             <div class="choice-grid time-grid" id="timeChoices"></div>
           </section>
         </div>
@@ -133,18 +154,29 @@
           <p class="reading" id="reading">じゅうみんひょう</p>
           <div class="target" id="target">住民票</div>
           <div class="typing-ghost" id="typingGhost"></div>
+          <div class="combo-display" id="comboDisplay"></div>
           <div class="progress-track" aria-hidden="true">
             <div id="progressBar"></div>
           </div>
-          <input id="typingInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="入力欄" />
+          <input
+            id="typingInput"
+            type="text"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            aria-label="入力欄"
+          />
         </div>
+
         <aside class="meaning-panel" aria-label="用語情報">
           <div class="timer-card">
             <span id="timeLeft">--:--</span>
             <small>time</small>
           </div>
           <h2 id="termTitle">住民票</h2>
-          <p id="meaning">住民の氏名、住所、生年月日などを記録した公的な証明書。</p>
+          <p id="meaning">
+            住民の氏名、住所、生年月日などを記録した公的な証明書。
+          </p>
           <p class="game-message" id="gameMessage">Enterで入力を確定できます。</p>
           <div class="tag-row" id="tagRow"></div>
         </aside>
@@ -182,6 +214,7 @@
         </div>
       </section>
     </main>
+
     <script src="./app.js"></script>
   </body>
 </html>
