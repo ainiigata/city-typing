@@ -211,6 +211,68 @@ const terms = RAW_TERMS.trim()
     return unique;
   }, []);
 
+const RANKS = [
+  { min: 0,    label: "書類迷子",     emoji: "📄", desc: "まだ役所の中で迷っています…" },
+  { min: 60,   label: "窓口見習い",   emoji: "🪟", desc: "窓口に立てるようになってきた" },
+  { min: 150,  label: "ハンコ係",     emoji: "🔴", desc: "ハンコをきれいに押せます" },
+  { min: 270,  label: "事務係員",     emoji: "📋", desc: "書類を読んで処理できる" },
+  { min: 420,  label: "主事補",       emoji: "🗂️", desc: "仕事が板についてきた" },
+  { min: 600,  label: "主事",         emoji: "🏛️", desc: "一人前の地方公務員" },
+  { min: 810,  label: "主任",         emoji: "⭐",  desc: "後輩から頼られる存在" },
+  { min: 1050, label: "係長補佐",     emoji: "⭐⭐", desc: "係を縁の下から支える" },
+  { min: 1320, label: "係長",         emoji: "⭐⭐⭐", desc: "係のまとめ役" },
+  { min: 1620, label: "課長補佐",     emoji: "🏆",  desc: "課の方針を作る側へ" },
+  { min: 1950, label: "課長",         emoji: "🏆🏆", desc: "課を率いるリーダー" },
+  { min: 2310, label: "部長",         emoji: "👑",  desc: "複数の課を統括する" },
+  { min: 2700, label: "局長",         emoji: "👑👑", desc: "局の頂点に立つ" },
+  { min: 3120, label: "副市長",       emoji: "🗳️",  desc: "市政の最重要人物" },
+  { min: 3570, label: "市長",         emoji: "🎖️",  desc: "市民が選んだトップ" },
+  { min: 4050, label: "県知事",       emoji: "🎖️🎖️", desc: "県全体を統べる" },
+  { min: 4560, label: "大臣",         emoji: "🌟",  desc: "国政の担い手" },
+  { min: 5100, label: "総理大臣",     emoji: "💫",  desc: "国家の最高責任者" },
+  { min: 5670, label: "伝説の公務員", emoji: "⚡",  desc: "語り継がれる行政の達人" },
+  { min: 6270, label: "行政の神",     emoji: "🔱",  desc: "もはや神の領域。敬礼。" }
+];
+
+function getRank(score) {
+  let idx = 0;
+  for (let i = 0; i < RANKS.length; i++) {
+    if (score >= RANKS[i].min) idx = i;
+    else break;
+  }
+  return { rank: RANKS[idx], idx };
+}
+
+function showRankReveal(score) {
+  const { rank, idx } = getRank(score);
+  const scaleEl = document.getElementById("rankScale");
+  const badgeEl = document.getElementById("rankBadge");
+  if (!scaleEl || !badgeEl) return;
+
+  document.getElementById("rankEmoji").textContent = rank.emoji;
+  document.getElementById("rankName").textContent = rank.label;
+  document.getElementById("rankDesc").textContent = rank.desc;
+  document.getElementById("rankPosition").textContent = String(idx + 1);
+
+  while (scaleEl.firstChild) scaleEl.removeChild(scaleEl.firstChild);
+  RANKS.forEach((_, i) => {
+    const dot = document.createElement("div");
+    dot.className = "rank-dot" + (i < idx ? " filled" : "") + (i === idx ? " current" : "");
+    if (i <= idx) dot.style.opacity = "0";
+    scaleEl.appendChild(dot);
+  });
+
+  badgeEl.classList.remove("show");
+  void badgeEl.offsetWidth;
+  setTimeout(() => badgeEl.classList.add("show"), 350);
+
+  scaleEl.querySelectorAll(".rank-dot").forEach((dot, i) => {
+    if (i <= idx) {
+      setTimeout(() => { dot.style.opacity = "1"; }, 620 + i * 44);
+    }
+  });
+}
+
 const TEST_SETTINGS = {
   all: { label: "総合", seconds: 180, size: 40, multiplier: 1 },
   1: { label: "基礎", seconds: 60, size: 20, multiplier: 1 },
@@ -416,33 +478,56 @@ function selectOption(selectEl, value) {
 }
 
 function renderChoiceButtons() {
-  els.categoryChoices.innerHTML = uniqueCategories()
-    .map((category) => {
-      const count = category === "すべて" ? terms.length : terms.filter((item) => item.category === category).length;
-      return `<button class="choice-button" type="button" data-choice="category" data-value="${category}">${category}<small>${count}語</small></button>`;
-    })
-    .join("");
+  els.categoryChoices.textContent = "";
+  uniqueCategories().forEach((category) => {
+    const count = category === "すべて" ? terms.length : terms.filter((item) => item.category === category).length;
+    const btn = document.createElement("button");
+    btn.className = "choice-button";
+    btn.type = "button";
+    btn.dataset.choice = "category";
+    btn.dataset.value = category;
+    btn.textContent = category;
+    const small = document.createElement("small");
+    small.textContent = count + "語";
+    btn.appendChild(small);
+    btn.addEventListener("click", () => selectOption(els.category, category));
+    els.categoryChoices.appendChild(btn);
+  });
 
-  els.levelChoices.innerHTML = LEVEL_OPTIONS.map(
-    (level) =>
-      `<button class="choice-button" type="button" data-choice="level" data-value="${level.value}">${level.label}<small>${level.note}</small></button>`
-  ).join("");
+  els.levelChoices.textContent = "";
+  LEVEL_OPTIONS.forEach((level) => {
+    const btn = document.createElement("button");
+    btn.className = "choice-button";
+    btn.type = "button";
+    btn.dataset.choice = "level";
+    btn.dataset.value = level.value;
+    btn.textContent = level.label;
+    const small = document.createElement("small");
+    small.textContent = level.note;
+    btn.appendChild(small);
+    btn.addEventListener("click", () => selectOption(els.level, level.value));
+    els.levelChoices.appendChild(btn);
+  });
 
-  els.timeChoices.innerHTML = TIME_OPTIONS.map((time) => {
+  els.timeChoices.textContent = "";
+  TIME_OPTIONS.forEach((time) => {
     const note = els.mode.value === "test" ? time.test : time.practice;
-    return `<button class="choice-button" type="button" data-choice="timer" data-value="${time.value}">${time.label}<small>${note}</small></button>`;
-  }).join("");
-
-  document.querySelectorAll("[data-choice]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const target = button.dataset.choice;
-      selectOption(els[target], button.dataset.value);
-    });
+    const btn = document.createElement("button");
+    btn.className = "choice-button";
+    btn.type = "button";
+    btn.dataset.choice = "timer";
+    btn.dataset.value = time.value;
+    btn.textContent = time.label;
+    const small = document.createElement("small");
+    small.textContent = note;
+    btn.appendChild(small);
+    btn.addEventListener("click", () => selectOption(els.timer, time.value));
+    els.timeChoices.appendChild(btn);
   });
 }
 
 function updateChoiceButtons() {
-  if (!els.categoryChoices.innerHTML) renderChoiceButtons();
+  if (!els.categoryChoices.firstChild) renderChoiceButtons();
   if (els.timeChoices.children.length !== TIME_OPTIONS.length) renderChoiceButtons();
   document.querySelectorAll("[data-choice]").forEach((button) => {
     const target = button.dataset.choice;
@@ -547,7 +632,12 @@ function renderTerm() {
   els.target.textContent = item.term;
   els.termTitle.textContent = item.term;
   els.meaning.textContent = item.meaning;
-  els.tagRow.innerHTML = item.tags.map((tag) => `<span>${tag}</span>`).join("");
+  els.tagRow.textContent = "";
+  item.tags.forEach((tag) => {
+    const span = document.createElement("span");
+    span.textContent = tag;
+    els.tagRow.appendChild(span);
+  });
   els.progressBar.style.width = "0%";
 }
 
@@ -555,40 +645,73 @@ function renderQueue() {
   const upcoming = state.queue.slice(0, 8);
   const count = state.queue.length + (state.current ? 1 : 0);
   els.remainingCount.textContent = `${count} terms`;
-  els.queueList.innerHTML = upcoming.length
-    ? upcoming.map((item) => `<li><strong>${item.term}</strong> ${item.reading}</li>`).join("")
-    : `<li class="empty">ラストです</li>`;
+  els.queueList.textContent = "";
+  if (upcoming.length === 0) {
+    const li = document.createElement("li");
+    li.className = "empty";
+    li.textContent = "ラストです";
+    els.queueList.appendChild(li);
+  } else {
+    upcoming.forEach((item) => {
+      const li = document.createElement("li");
+      const strong = document.createElement("strong");
+      strong.textContent = item.term;
+      li.appendChild(strong);
+      li.append(" " + item.reading);
+      els.queueList.appendChild(li);
+    });
+  }
 }
 
 function renderReview() {
+  els.reviewList.textContent = "";
   if (state.review.length === 0) {
-    els.reviewList.innerHTML = `<li class="empty">まだありません</li>`;
+    const li = document.createElement("li");
+    li.className = "empty";
+    li.textContent = "まだありません";
+    els.reviewList.appendChild(li);
     return;
   }
-  els.reviewList.innerHTML = state.review
-    .slice(0, 8)
-    .map((item) => `<li><strong>${item.term}</strong> ${item.meaning}</li>`)
-    .join("");
+  state.review.slice(0, 8).forEach((item) => {
+    const li = document.createElement("li");
+    const strong = document.createElement("strong");
+    strong.textContent = item.term;
+    li.appendChild(strong);
+    li.append(" " + item.meaning);
+    els.reviewList.appendChild(li);
+  });
 }
 
 function renderRecords() {
+  els.recordList.textContent = "";
   if (state.records.length === 0) {
-    els.recordList.innerHTML = `<li class="empty">テスト完了後に記録されます</li>`;
+    const li = document.createElement("li");
+    li.className = "empty";
+    li.textContent = "テスト完了後に記録されます";
+    els.recordList.appendChild(li);
     return;
   }
-  els.recordList.innerHTML = [...state.records]
+  [...state.records]
     .sort((a, b) => b.score - a.score || b.completed - a.completed || b.date - a.date)
     .slice(0, 8)
-    .map((record) => {
+    .forEach((record) => {
       const date = new Date(record.date).toLocaleDateString("ja-JP", {
         month: "numeric",
         day: "numeric",
         hour: "2-digit",
         minute: "2-digit"
       });
-      return `<li><strong>${record.score}</strong> ${record.levelLabel} ${record.seconds}秒<span class="record-meta">${record.completed}問 / 正確率 ${record.accuracy}% / ${record.kpm} kpm / ${date}</span></li>`;
-    })
-    .join("");
+      const li = document.createElement("li");
+      const strong = document.createElement("strong");
+      strong.textContent = record.score;
+      li.appendChild(strong);
+      li.append(` ${record.levelLabel} ${record.seconds}秒`);
+      const meta = document.createElement("span");
+      meta.className = "record-meta";
+      meta.textContent = `${record.completed}問 / 正確率 ${record.accuracy}% / ${record.kpm} kpm / ${date}`;
+      li.appendChild(meta);
+      els.recordList.appendChild(li);
+    });
 }
 
 function updateStats() {
@@ -622,8 +745,9 @@ function finishSession(reason) {
   const kpm = currentKpm();
   if (els.mode.value === "test") saveRecord(reason, accuracy, kpm);
   setBodyComboLevel(0);
-  els.resultSummary.textContent = `${reason}: ${state.completed}問完了 / score ${state.score} / 正確率 ${accuracy}% / ${kpm} kpm / 最高コンボ ${state.bestStreak}`;
+  els.resultSummary.textContent = `${reason} — ${state.completed}問 / ${state.score}pts / 正確率${accuracy}% / ${kpm}kpm / 最高${state.bestStreak}コンボ`;
   els.resultPanel.classList.add("show");
+  showRankReveal(state.score);
 }
 
 function saveRecord(reason, accuracy, kpm) {
@@ -726,9 +850,13 @@ function handleKeydown(event) {
 }
 
 function setupCategoryOptions() {
-  els.category.innerHTML = uniqueCategories()
-    .map((category) => `<option value="${category}">${category}</option>`)
-    .join("");
+  els.category.textContent = "";
+  uniqueCategories().forEach((category) => {
+    const opt = document.createElement("option");
+    opt.value = category;
+    opt.textContent = category;
+    els.category.appendChild(opt);
+  });
 }
 
 setupCategoryOptions();
