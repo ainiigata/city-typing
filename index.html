@@ -183,11 +183,23 @@
       </section>
 
       <section class="result-panel" id="resultPanel" data-view="play" aria-label="結果">
-        <div>
-          <h2>テスト結果</h2>
-          <p id="resultSummary">まだ結果はありません。</p>
+        <div class="result-header">
+          <div>
+            <h2>テスト結果</h2>
+            <p id="resultSummary"></p>
+          </div>
+          <button id="retryTest" type="button">もう一度</button>
         </div>
-        <button id="retryTest" type="button">もう一度</button>
+        <div class="rank-reveal" id="rankReveal">
+          <p class="rank-eyebrow">あなたのランクは</p>
+          <div class="rank-badge" id="rankBadge">
+            <span class="rank-emoji" id="rankEmoji">⭐</span>
+            <span class="rank-name" id="rankName">係長</span>
+          </div>
+          <p class="rank-desc" id="rankDesc">部下をまとめる</p>
+          <div class="rank-scale" id="rankScale"></div>
+          <p class="rank-scale-label">全<span>20</span>段階中 第<span id="rankPosition">8</span>位</p>
+        </div>
       </section>
 
       <section class="lower-grid" id="lowerGrid" data-view="play" aria-label="学習状況">
