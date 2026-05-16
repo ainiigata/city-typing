@@ -212,46 +212,47 @@ const terms = RAW_TERMS.trim()
   }, []);
 
 const RANKS = [
-  { min: 0,    label: "書類迷子",     emoji: "📄", desc: "まだ役所の中で迷っています…" },
-  { min: 60,   label: "窓口見習い",   emoji: "🪟", desc: "窓口に立てるようになってきた" },
-  { min: 150,  label: "ハンコ係",     emoji: "🔴", desc: "ハンコをきれいに押せます" },
-  { min: 270,  label: "事務係員",     emoji: "📋", desc: "書類を読んで処理できる" },
-  { min: 420,  label: "主事補",       emoji: "🗂️", desc: "仕事が板についてきた" },
-  { min: 600,  label: "主事",         emoji: "🏛️", desc: "一人前の地方公務員" },
-  { min: 810,  label: "主任",         emoji: "⭐",  desc: "後輩から頼られる存在" },
-  { min: 1050, label: "係長補佐",     emoji: "⭐⭐", desc: "係を縁の下から支える" },
-  { min: 1320, label: "係長",         emoji: "⭐⭐⭐", desc: "係のまとめ役" },
-  { min: 1620, label: "課長補佐",     emoji: "🏆",  desc: "課の方針を作る側へ" },
-  { min: 1950, label: "課長",         emoji: "🏆🏆", desc: "課を率いるリーダー" },
-  { min: 2310, label: "部長",         emoji: "👑",  desc: "複数の課を統括する" },
-  { min: 2700, label: "局長",         emoji: "👑👑", desc: "局の頂点に立つ" },
-  { min: 3120, label: "副市長",       emoji: "🗳️",  desc: "市政の最重要人物" },
-  { min: 3570, label: "市長",         emoji: "🎖️",  desc: "市民が選んだトップ" },
-  { min: 4050, label: "県知事",       emoji: "🎖️🎖️", desc: "県全体を統べる" },
-  { min: 4560, label: "大臣",         emoji: "🌟",  desc: "国政の担い手" },
-  { min: 5100, label: "総理大臣",     emoji: "💫",  desc: "国家の最高責任者" },
-  { min: 5670, label: "伝説の公務員", emoji: "⚡",  desc: "語り継がれる行政の達人" },
-  { min: 6270, label: "行政の神",     emoji: "🔱",  desc: "もはや神の領域。敬礼。" }
+  { min: 0,    label: "書類迷子",      emoji: "📄", desc: "まだ役所の中で迷っています…" },
+  { min: 25,   label: "窓口見習い",    emoji: "🪟", desc: "窓口に立てるようになってきた" },
+  { min: 55,   label: "ハンコ係",      emoji: "🔴", desc: "ハンコをきれいに押せます" },
+  { min: 90,   label: "事務係員",      emoji: "📋", desc: "書類を読んで処理できる" },
+  { min: 130,  label: "主事補",        emoji: "🗂️", desc: "仕事が板についてきた" },
+  { min: 175,  label: "主事",          emoji: "🏛️", desc: "一人前の地方公務員" },
+  { min: 225,  label: "主任",          emoji: "⭐",  desc: "後輩から頼られる存在" },
+  { min: 280,  label: "係長補佐",      emoji: "⭐⭐", desc: "係を縁の下から支える" },
+  { min: 340,  label: "係長",          emoji: "⭐⭐⭐", desc: "係のまとめ役" },
+  { min: 405,  label: "課長補佐",      emoji: "🏆",  desc: "課の方針を作る側へ" },
+  { min: 475,  label: "課長",          emoji: "🏆🏆", desc: "課を率いるリーダー" },
+  { min: 550,  label: "部長",          emoji: "👑",  desc: "複数の課を統括する" },
+  { min: 630,  label: "局長",          emoji: "👑👑", desc: "局の頂点に立つ" },
+  { min: 715,  label: "副市長",        emoji: "🗳️",  desc: "市政の最重要人物" },
+  { min: 805,  label: "市長",          emoji: "🎖️",  desc: "市民が選んだトップ" },
+  { min: 900,  label: "県知事",        emoji: "🎖️🎖️", desc: "県全体を統べる" },
+  { min: 1000, label: "大臣",          emoji: "🌟",  desc: "国政の担い手" },
+  { min: 1105, label: "総理大臣",      emoji: "💫",  desc: "国家の最高責任者" },
+  { min: 1215, label: "伝説の公務員",  emoji: "⚡",  desc: "語り継がれる行政の達人" },
+  { min: 1330, label: "行政の神",      emoji: "🔱",  desc: "もはや神の領域。敬礼。" }
 ];
 
-function getRank(score) {
+function getRank(ppm) {
   let idx = 0;
   for (let i = 0; i < RANKS.length; i++) {
-    if (score >= RANKS[i].min) idx = i;
+    if (ppm >= RANKS[i].min) idx = i;
     else break;
   }
   return { rank: RANKS[idx], idx };
 }
 
-function showRankReveal(score) {
-  const { rank, idx } = getRank(score);
+function showRankReveal(totalScore, elapsedSec) {
+  const ppm = Math.round(totalScore / Math.max(elapsedSec, 10) * 60);
+  const { rank, idx } = getRank(ppm);
   const scaleEl = document.getElementById("rankScale");
   const badgeEl = document.getElementById("rankBadge");
   if (!scaleEl || !badgeEl) return;
 
   document.getElementById("rankEmoji").textContent = rank.emoji;
   document.getElementById("rankName").textContent = rank.label;
-  document.getElementById("rankDesc").textContent = rank.desc;
+  document.getElementById("rankDesc").textContent = rank.desc + "  [" + ppm + " pts/分]";
   document.getElementById("rankPosition").textContent = String(idx + 1);
 
   while (scaleEl.firstChild) scaleEl.removeChild(scaleEl.firstChild);
@@ -355,8 +356,8 @@ const els = {
 function spawnScoreFloat(pts) {
   const el = document.createElement("div");
   el.className = "score-float";
-  el.textContent = `+${pts}`;
-  el.style.setProperty("--x", `${25 + Math.random() * 50}%`);
+  el.textContent = "+" + pts;
+  el.style.setProperty("--x", (25 + Math.random() * 50) + "%");
   document.querySelector(".term-panel").appendChild(el);
   el.addEventListener("animationend", () => el.remove());
 }
@@ -366,8 +367,8 @@ function showCombo(streak) {
   if (!el) return;
   const labels = ["", "", "", "NICE!", "GREAT!", "AMAZING!", "SUPER!!",
                   "ULTRA!!", "HYPER!!", "LEGEND!!", "🔥 GODLIKE!!"];
-  el.textContent = streak >= 10 ? `🔥 ${streak} COMBO!!`
-    : `${labels[streak] || ""} ${streak} COMBO!`;
+  el.textContent = streak >= 10 ? "🔥 " + streak + " COMBO!!"
+    : (labels[streak] || "") + " " + streak + " COMBO!";
   el.classList.remove("show");
   void el.offsetWidth;
   el.classList.add("show");
@@ -544,11 +545,11 @@ function updateStartSummary() {
   const plannedSize = Math.min(testSize(), count);
   const timeText =
     els.mode.value === "test" && els.timer.value === "0"
-      ? `${selectedTestSeconds()}秒`
+      ? selectedTestSeconds() + "秒"
       : els.mode.value === "practice" && els.timer.value === "0"
         ? "無制限"
         : time?.label || "標準";
-  els.startSummary.textContent = `${modeLabel} / ${els.category.value} / ${levelText} / ${timeText}`;
+  els.startSummary.textContent = modeLabel + " / " + els.category.value + " / " + levelText + " / " + timeText;
   els.startRun.disabled = count === 0;
   if (count === 0) {
     els.startHint.textContent = "この組み合わせは出題できる用語がありません。分野か難易度を変えてください。";
@@ -556,8 +557,8 @@ function updateStartSummary() {
   }
   els.startHint.textContent =
     els.mode.value === "test"
-      ? `${plannedSize}問、${selectedTestSeconds()}秒でスコアを記録します。`
-      : `${count}語から出題します。意味を見ながら、自分のペースで練習します。`;
+      ? plannedSize + "問、" + selectedTestSeconds() + "秒でスコアを記録します。"
+      : count + "語から出題します。意味を見ながら、自分のペースで練習します。";
 }
 
 function startSession() {
@@ -614,7 +615,7 @@ function nextTerm() {
   els.input.classList.remove("miss", "correct");
   els.gameMessage.textContent =
     els.mode.value === "test"
-      ? `${TEST_SETTINGS[els.level.value].label}テスト: 漢字変換まで合わせて入力します。`
+      ? TEST_SETTINGS[els.level.value].label + "テスト: 漢字変換まで合わせて入力します。"
       : "漢字に変換して、用語と同じ文字で入力してください。";
   renderTerm();
   renderQueue();
@@ -644,7 +645,7 @@ function renderTerm() {
 function renderQueue() {
   const upcoming = state.queue.slice(0, 8);
   const count = state.queue.length + (state.current ? 1 : 0);
-  els.remainingCount.textContent = `${count} terms`;
+  els.remainingCount.textContent = count + " terms";
   els.queueList.textContent = "";
   if (upcoming.length === 0) {
     const li = document.createElement("li");
@@ -705,10 +706,10 @@ function renderRecords() {
       const strong = document.createElement("strong");
       strong.textContent = record.score;
       li.appendChild(strong);
-      li.append(` ${record.levelLabel} ${record.seconds}秒`);
+      li.append(" " + record.levelLabel + " " + record.seconds + "秒");
       const meta = document.createElement("span");
       meta.className = "record-meta";
-      meta.textContent = `${record.completed}問 / 正確率 ${record.accuracy}% / ${record.kpm} kpm / ${date}`;
+      meta.textContent = record.completed + "問 / 正確率 " + record.accuracy + "% / " + record.kpm + " kpm / " + date;
       li.appendChild(meta);
       els.recordList.appendChild(li);
     });
@@ -716,7 +717,7 @@ function renderRecords() {
 
 function updateStats() {
   els.score.textContent = String(state.score);
-  els.accuracy.textContent = `${currentAccuracy()}%`;
+  els.accuracy.textContent = currentAccuracy() + "%";
   els.streak.textContent = String(state.streak);
   els.speed.textContent = String(currentKpm());
 }
@@ -728,7 +729,7 @@ function updateTimer() {
   }
   const minutes = String(Math.floor(state.secondsLeft / 60)).padStart(2, "0");
   const seconds = String(state.secondsLeft % 60).padStart(2, "0");
-  els.timeLeft.textContent = `${minutes}:${seconds}`;
+  els.timeLeft.textContent = minutes + ":" + seconds;
 }
 
 function finishSession(reason) {
@@ -745,9 +746,10 @@ function finishSession(reason) {
   const kpm = currentKpm();
   if (els.mode.value === "test") saveRecord(reason, accuracy, kpm);
   setBodyComboLevel(0);
-  els.resultSummary.textContent = `${reason} — ${state.completed}問 / ${state.score}pts / 正確率${accuracy}% / ${kpm}kpm / 最高${state.bestStreak}コンボ`;
+  const elapsedSec = Math.max((Date.now() - state.startedAt) / 1000, 10);
+  els.resultSummary.textContent = reason + " — " + state.completed + "問 / " + state.score + "pts / 正確率" + accuracy + "% / " + kpm + "kpm / 最高" + state.bestStreak + "コンボ";
   els.resultPanel.classList.add("show");
-  showRankReveal(state.score);
+  showRankReveal(state.score, elapsedSec);
 }
 
 function saveRecord(reason, accuracy, kpm) {
@@ -788,8 +790,8 @@ function updateGhost(value) {
   const target = state.current.term;
   const typed = escapeHtml(target.slice(0, value.length));
   const rest = escapeHtml(target.slice(value.length));
-  const wrong = value && !target.startsWith(value) ? `<em>${escapeHtml(value)}</em>` : "";
-  els.typingGhost.innerHTML = wrong || `<b>${typed}</b>${rest}`;
+  const wrong = value && !target.startsWith(value) ? "<em>" + escapeHtml(value) + "</em>" : "";
+  els.typingGhost.innerHTML = wrong || "<b>" + typed + "</b>" + rest;
 }
 
 function handleInput() {
@@ -802,7 +804,7 @@ function handleInput() {
   const isComplete = value === target;
   const progress = Math.min(100, Math.round((value.length / target.length) * 100));
 
-  els.progressBar.style.width = `${progress}%`;
+  els.progressBar.style.width = progress + "%";
   els.input.classList.toggle("miss", value.length > 0 && !isPrefix);
   els.input.classList.toggle("correct", isComplete);
   updateGhost(value);
@@ -830,7 +832,7 @@ function handleInput() {
     state.streak += 1;
     state.bestStreak = Math.max(state.bestStreak, state.streak);
     els.input.dataset.previousLength = "0";
-    els.gameMessage.textContent = `正解。${state.streak}コンボ`;
+    els.gameMessage.textContent = "正解。" + state.streak + "コンボ";
     spawnScoreFloat(earned);
     if (state.streak >= 3) showCombo(state.streak);
     setBodyComboLevel(state.streak);
